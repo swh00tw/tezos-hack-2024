@@ -1,0 +1,9 @@
+export type storage = set<address>;
+
+
+type return_ = [list<operation>, storage];
+
+@entry
+const pwrPerks = (_: unit, store: storage): return_ => {
+  return [list([]), Set.add(Tezos.get_source(), store)]
+};
