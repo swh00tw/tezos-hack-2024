@@ -1,73 +1,252 @@
-export type pwrPerksMessage = {
-    user : address,
-    feedback : string
+
+/* SOME GENERAL TYPES */
+type token_id_type = nat;
+type nr_of_tokens_type = nat;
+type amount_type = nat;
+type admin_type = address;
+type new_owner_type = address;
+type owner_address_type = address;
+type operator_address_type = address;
+
+/* TRANSFER TYPES */
+type transfer_destination_type =
+// @layout:comb 
+{
+    to_: address,
+    token_id: token_id_type,
+    amount: amount_type
+};
+type transfer_type =
+// @layout:comb 
+{
+    from_: address,
+    txs: list<transfer_destination_type>
+};
+type transfer_params_type = list<transfer_type>;
+
+/* BALANCE OF TYPES */
+type balance_of_request_type =
+// @layout:comb 
+{
+    owner: address,
+    token_id: token_id_type
+};
+type balance_of_response_type =
+// @layout:comb 
+{
+    request: balance_of_request_type,
+    balance: nat
+};
+type balance_of_params_type =
+// @layout:comb 
+{
+    requests: list<balance_of_request_type>,
+    callback: contract<list<balance_of_response_type>>
 };
 
-export type storage = {
-    pwrPerksTraces : map<address, pwrPerksMessage>,
-    feedback : string
+/* UPDATE OPERATORS TYPES */
+type update_operator_action_params_type =
+// @layout:comb 
+{
+    owner: address,
+    operator: address,
+    token_id: token_id_type
+};
+type update_operator_action_type =
+// @layout:comb 
+| ["Add_operator", update_operator_action_params_type]
+| ["Remove_operator", update_operator_action_params_type];
+type update_operators_params_type = list<update_operator_action_type>;
+
+/* OPERATOR TYPES */
+type operators_key_type = [owner_address_type, [operator_address_type, token_id_type]];
+type operators_type = big_map<operators_key_type, unit>;
+
+
+
+type token_info_type = map<string, bytes>;
+type token_metadata_value_type =
+// @layout:comb 
+{
+    token_id: token_id_type,
+    token_info: token_info_type
+};
+type token_metadata_type = big_map<token_id_type, token_metadata_value_type>;
+
+/**
+ * OFF/ON CHAIN VIEWS TYPES
+ * TZIP-12, TZIP-16
+ */
+type all_tokens_type = list<token_id_type>;
+type get_balance_params_type =
+// @layout:comb 
+{
+    owner: owner_address_type,
+    token_id: token_id_type
+};
+type total_supply_type = big_map<token_id_type, nr_of_tokens_type>;
+type total_supply_params_type = token_id_type;
+type is_operator_params_type =
+// @layout:comb 
+{
+    owner: owner_address_type,
+    operator: operator_address_type,
+    token_id: token_id_type
 };
 
-type return_ = [list<operation>, storage];
 
+/**
+ * CONTRACT METADATA TYPES
+ * TZIP-16
+ * https://gitlab.com/tezos/tzip/-/blob/master/proposals/tzip-16/tzip-16.md
+ */
+type contract_metadata_type = big_map<string, bytes>;
 
-
-@entry
-const pwrPerks = (_ : unit, store : storage) : return_ => {
-    let feedbackMessage = {user : Tezos.get_self_address() ,feedback: ""};
-    return [  list([]) as list<operation>, {...store,
-        pwrPerksTraces : Map.add(Tezos.get_source(), feedbackMessage, store.pwrPerksTraces) }];
+/* STORAGE TYPES */
+type storage_type =
+{
+    operators: operators_type,
+    metadata: contract_metadata_type,
+    token_metadata: token_metadata_type,
+    total_supply: total_supply_type,
+    all_tokens: all_tokens_type,
+    admin: admin_type
 };
 
+/* ACTION TYPES */
+type action_type =
+| ["Balance_of", balance_of_params_type]
+| ["Transfer", transfer_params_type] 
+| ["Update_operators", update_operators_params_type];
 
-type returned_feedback = [address, string]; //address that gives feedback and a string message
+/* RETURN TYPES */
+type return_type = [list<operation>, storage_type];
 
-type oracle_param = contract<returned_feedback>;
 
-@no_mutation
-@entry
-const getFeedback = (contract_callback : contract<returned_feedback>, store : storage): return_ => {
-    let op : operation = Tezos.transaction(
-            [Tezos.get_self_address(),store.feedback],
-            (0 as mutez),
-            contract_callback);
-    return [list([op]) ,store];
-};
 
-@no_mutation
-@entry
-const pwrPerksAndGetFeedback = (oracleAddress: address, store: storage): return_ => {
-  //Read the feedback view
+// const transfer = (params: transfer_params_type, storage: storage_type): return_type => {
+//   const transaction_sender = Tezos.sender;
+//   const transfers: list<transfer_type> = params;
 
-  let feedbackOpt: option<string> =
-    Tezos.call_view("feedback", unit, oracleAddress);
-  match(feedbackOpt) {
-    when (Some(feedback)):
-      do {
-        let feedbackMessage = { user: oracleAddress, feedback: feedback };
-        return [
-          list([]) as list<operation>,
-          {
-            ...store,
-            pwrPerksTraces: Map.add(
-              Tezos.get_source(),
-              feedbackMessage,
-              store.pwrPerksTraces
-            )
-          }
-        ];
-      }
-    when (None()):
-      failwith("Cannot find view feedback on given oracle address")
-  };
-};
+//   const new_ledger = List.fold((ledger: ledger_type, transfer_operation: transfer_type): ledger_type => {
+//     const transfer_from: address = transfer_operation.from_;
+//     const transfer_destinations: list<transfer_destination_type> = transfer_operation.txs;
 
-@entry
-const pwrPerksAndGetFeedbackCallback = (feedback : returned_feedback, store : storage) : return_ => {
-    let feedbackMessage = {user : feedback[0] ,feedback: feedback[1]};
-    return [  list([]) as list<operation>, {...store,
-        pwrPerksTraces : Map.add(Tezos.get_source(), feedbackMessage , store.pwrPerksTraces) }];
-};
+//     return List.fold((ledger: ledger_type, transfer_destination: transfer_destination_type): ledger_type => {
+//       const transfer_to: address = transfer_destination.to_;
+//       const transfer_amount: amount_type = transfer_destination.get_amount; // Assuming amount_type is nat or similar
 
-@view
-export const feedback = (_: unit, store: storage): string => { return store.feedback };
+//       const is_sender_an_owner: bool = transaction_sender == transfer_from;
+//       const operators_key: operators_key_type = [transfer_from, transaction_sender]; // Adjusted for FTs
+//       const is_sender_an_operator: bool = Big_map.mem(operators_key, storage.operators);
+      
+//       /* only owner or owner's operator can make a transfer */
+//       let _assert = assert_with_error(
+//         is_sender_an_owner || is_sender_an_operator,
+//         fa2_not_operator_error_const
+//       );
+
+//       /* ignore empty transfers; return unchanged ledger */
+//       if (transfer_amount == (0 as nat)) {
+//         return ledger;
+//       } else {
+//         const previous_owner_balance: nat = match(Big_map.find_opt(transfer_from, ledger), {
+//            Some: balance => balance,
+//            None: () => 0 as nat
+//         });
+//         const new_owner_balance: nat = match(Big_map.find_opt(transfer_to, ledger), {
+//            Some: balance => balance,
+//            None: () => 0 as nat
+//         });
+
+//         /* owner needs to have enough tokens to transfer */
+//         _assert = assert_with_error(previous_owner_balance >= transfer_amount, fa2_insufficient_balance_error_const);
+
+//         /* Transfer tokens by adjusting balances */
+//         const ledger_after_deduction: ledger_type = Big_map.add(transfer_from, previous_owner_balance - transfer_amount, ledger);
+//         const ledger_after_transfer: ledger_type = Big_map.add(transfer_to, new_owner_balance + transfer_amount, ledger_after_deduction);
+
+//         /* return new ledger */
+//         return ledger_after_transfer;
+//       }
+//     }, transfer_destinations, ledger)
+//   }, transfers, storage.ledger);
+
+//   return [list([]) as list<operation>, { ...storage, ledger: new_ledger }];
+// };
+
+
+
+// export type pwrPerksMessage = {
+//     receiver : address,
+//     feedback : string
+// };
+
+// type storage = {
+//     pwrPerksTraces : map<address, pwrPerksMessage>,
+//     balance : nat,
+//     feedback : string
+// };
+
+
+// type return_ = [list<operation>, storage];
+
+// @entry
+// const pwrPerks = (_ : unit, store : storage) : return_ => {
+//     let feedbackMessage = {receiver : Tezos.get_self_address() ,feedback: ""};
+//     return [  list([]) as list<operation>, {...store,
+//         pwrPerksTraces : Map.add(Tezos.get_source(), feedbackMessage, store.pwrPerksTraces) }];
+// };
+
+
+// type returned_feedback = [address, string]; //address that gives feedback and a string message
+
+// type oracle_param = contract<returned_feedback>;
+
+// @no_mutation
+// @entry
+// const getFeedback = (contract_callback : contract<returned_feedback>, store : storage): return_ => {
+//     let op : operation = Tezos.transaction(
+//             [Tezos.get_self_address(),store.feedback],
+//             (1 as mutez),
+//             contract_callback);
+//     return [list([op]) ,store];
+// };
+
+// @no_mutation
+// @entry
+// const pwrPerksAndGetFeedback = (oracleAddress: address, store: storage): return_ => {
+//   //Read the feedback view
+
+//   let feedbackOpt: option<string> =
+//     Tezos.call_view("feedback", unit, oracleAddress);
+//   match(feedbackOpt) {
+//     when (Some(feedback)):
+//       do {
+//         let feedbackMessage = { receiver: oracleAddress, feedback: feedback };
+//         return [
+//           list([]) as list<operation>,
+//           {
+//             ...store,
+//             pwrPerksTraces: Map.add(
+//               Tezos.get_source(),
+//               feedbackMessage,
+//               store.pwrPerksTraces
+//             )
+//           }
+//         ];
+//       }
+//     when (None()):
+//       failwith("Cannot find view feedback on given oracle address")
+//   };
+// };
+
+// @entry
+// const pwrPerksAndGetFeedbackCallback = (feedback : returned_feedback, store : storage) : return_ => {
+//     let feedbackMessage = {receiver : feedback[0] ,feedback: feedback[1]};
+//     return [  list([]) as list<operation>, {...store,
+//         pwrPerksTraces : Map.add(Tezos.get_source(), feedbackMessage , store.pwrPerksTraces) }];
+// };
+
+// @view
+// export const feedback = (_: unit, store: storage): string => { return store.feedback };

@@ -6,5 +6,6 @@
 // E.g.: `const storage: int = 10` or `const storage: Contract.storage = 10`
 const default_storage: Contract.storage = {
     pwrPerksTraces: Map.empty as map<address, Contract.pwrPerksMessage>,
+    balance : 10n,
     feedback: "kiss"
 };
