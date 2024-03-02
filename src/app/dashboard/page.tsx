@@ -1,8 +1,13 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { getUserServerside } from "@/utils/getUserServerside";
+import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
-  const username = cookies().get("username");
-  return <div>{username?.value}</div>;
+  const user = await getUserServerside();
+  if (!user) {
+    redirect("/");
+  }
+
+  return <div>{user?.username}</div>;
 }

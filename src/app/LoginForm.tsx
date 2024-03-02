@@ -4,9 +4,10 @@ import { Text, TextField, Button } from "@radix-ui/themes";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { userCredentialTable } from "@/mockdata/user";
+import { userCredentialTable, userInfoTable } from "@/mockdata/user";
 import { useRouter } from "next/navigation";
 import clientEnv from "@/clientEnv";
+import { useAuth } from "./AuthProvider";
 
 const UserLoginSchema = z.object({
   username: z.string().min(1),
@@ -14,6 +15,7 @@ const UserLoginSchema = z.object({
 });
 
 export function LoginForm() {
+  const { setUser } = useAuth();
   const router = useRouter();
   const { register, handleSubmit, formState, setError } = useForm({
     resolver: zodResolver(UserLoginSchema),
@@ -51,6 +53,7 @@ export function LoginForm() {
         await fetch(
           `${clientEnv.NEXT_PUBLIC_BASE_URL}/api/auth/login?username=${user.username}`
         );
+        setUser(userInfoTable[user.username]);
         router.push("/dashboard");
       })}
     >
@@ -92,7 +95,9 @@ export function LoginForm() {
         >
           Sign up
         </Button>
-        <Button type="submit">Log In</Button>
+        <Button type="submit" className="bg-green-8 text-white">
+          Log In
+        </Button>
       </div>
     </form>
   );

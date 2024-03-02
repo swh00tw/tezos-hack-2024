@@ -1,7 +1,14 @@
 import { cn } from "@/utils/cn";
 import { LoginForm } from "./LoginForm";
+import { getUserServerside } from "@/utils/getUserServerside";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const user = await getUserServerside();
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <div
       className={cn(
