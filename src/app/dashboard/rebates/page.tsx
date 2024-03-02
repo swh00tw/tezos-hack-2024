@@ -7,7 +7,7 @@ function SponsorCard() {
   const sponsorImage = `/rebate-${randomIdx}.png`;
 
   return (
-    <div className="p-4 flex flex-col gap-y-4 justify-center items-center">
+    <div className="p-4 flex flex-col gap-y-4 justify-between items-center h-[160px]">
       <Image src={sponsorImage} alt="sponsor image" width={150} height={150} />
       <Button className="w-full">Buy</Button>
     </div>
