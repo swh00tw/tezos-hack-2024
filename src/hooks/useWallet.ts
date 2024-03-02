@@ -5,8 +5,8 @@ import * as api from "@tzkt/sdk-api";
 import { useEffect, useState } from "react";
 
 export function useWallet() {
-  const [userAddress, setUserAddress] = useState<string>("");
-  const [userBalance, setUserBalance] = useState<number>(0);
+  const [userAddress, setUserAddress] = useState<string | null>(null);
+  const [userBalance, setUserBalance] = useState<number | null>(null);
 
   api.defaults.baseUrl = "https://api.ghostnet.tzkt.io";
 
@@ -27,9 +27,6 @@ export function useWallet() {
       }
     })();
   }, []);
-
-  console.log("userAddress", userAddress);
-  console.log("userBalance", userBalance);
 
   return {
     userAddress,

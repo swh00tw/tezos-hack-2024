@@ -4,5 +4,6 @@ import { userInfoTable } from "@/mockdata/user";
 
 export async function getUserServerside() {
   const username = cookies().get("username")?.value;
-  return username ? userInfoTable[username] : null;
+  const address = cookies().get("address")?.value;
+  return username && address ? userInfoTable[username] : null;
 }
