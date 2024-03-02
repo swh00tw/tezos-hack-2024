@@ -1,12 +1,48 @@
+"use client";
+
 import { cn } from "@/utils/cn";
 import { Text, Flex } from "@radix-ui/themes";
 import { UserInfoSection } from "./UserInfoSection";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+function NavButton(props: { route: string; children: React.ReactNode }) {
+  const pathname = usePathname();
+  const { route, children } = props;
+  const isActive = pathname === `/dashboard${route}`;
+  console.log(isActive);
+
+  return (
+    <Link href={`/dashboard${route}`}>
+      <Flex
+        className={cn({
+          "text-green-10 font-medium": isActive,
+        })}
+      >
+        {children}
+      </Flex>
+    </Link>
+  );
+}
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col p-8 min-h-[90svh] gap-y-4">
-      <Flex className="min-h-[70svh] justify-between">
-        <div className="flex w-full md:w-[60%]">{children}</div>
+      <Flex
+        className="min-h-[70svh] justify-between"
+        direction={{
+          initial: "column-reverse",
+          md: "row",
+        }}
+      >
+        <div className="flex flex-col w-full md:w-[60%] gap-y-4">
+          <Flex gap="8" className="justify-start">
+            <NavButton route="">Current Bill</NavButton>
+            <NavButton route="/activity">Activity</NavButton>
+            <NavButton route="/rebates">Rebates</NavButton>
+          </Flex>
+          <div>{children}</div>
+        </div>
         <div className="flex w-full md:w-[35%]">
           <UserInfoSection />
         </div>

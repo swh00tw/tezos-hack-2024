@@ -16,9 +16,6 @@ export const DisconnectButton = (): JSX.Element => {
     await wallet.clearActiveAccount();
     // logout the user, clear to cookie
     await logout();
-    // redirect to the home page
-    router.push("/");
-    window.location.reload();
   };
 
   return (

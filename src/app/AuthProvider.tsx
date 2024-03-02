@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { UserInfo } from "@/mockdata/user";
 import clientEnv from "@/clientEnv";
 import { useRouter } from "next/navigation";
@@ -28,7 +28,8 @@ export function AuthProvider({
   const logout = async () => {
     setUser(null);
     await fetch(`${clientEnv.NEXT_PUBLIC_BASE_URL}/api/auth/logout`);
-    router.push("/");
+    router.refresh();
+    window.location.href = "/";
   };
 
   return (
