@@ -55,7 +55,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <NavButton route="/activity">Activity</NavButton>
             <NavButton route="/rebates">Rebates</NavButton>
           </Flex>
-          <div>{children}</div>
+          <div className="max-h-[60svh] overflow-scroll">{children}</div>
         </div>
         <div className="flex w-full md:w-[35%]">
           <UserInfoSection />
