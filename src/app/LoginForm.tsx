@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { userCredentialTable } from "@/mockdata/user";
 import { useRouter } from "next/navigation";
+import clientEnv from "@/clientEnv";
 
 const UserLoginSchema = z.object({
   username: z.string().min(1),
@@ -47,6 +48,9 @@ export function LoginForm() {
           return;
         }
         // if so, redirect to the dashboard
+        await fetch(
+          `${clientEnv.NEXT_PUBLIC_BASE_URL}/api/auth/login?username=${user.username}`
+        );
         router.push("/dashboard");
       })}
     >
