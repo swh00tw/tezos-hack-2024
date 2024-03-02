@@ -4,4 +4,3 @@
 
 // IMPORTANT: We suggest always explicitly typing your parameter values:
 // E.g.: `const parameter: int = 10` or `const parameter: Contract.parameter = 10`
-const default_parameter: parameter_of Contract = PwrPerks();

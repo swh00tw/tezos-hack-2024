@@ -1,0 +1,72 @@
+#import "./pwrPerks.jsligo" "PwrPerksGo"
+
+export type main_fn = module_contract<parameter_of PwrPerksGo, PwrPerksGo.storage>;
+
+// reset state
+
+const _ = Test.reset_state(2 as nat, list([]) as list<tez>);
+
+const faucet = Test.nth_bootstrap_account(0);
+
+const sender1: address = Test.nth_bootstrap_account(1);
+
+const _2 = Test.log("Sender 1 has balance : ");
+
+const _3 = Test.log(Test.get_balance_of_address(sender1));
+
+const _4 = Test.set_baker(faucet);
+
+const _5 = Test.set_source(faucet);
+
+export const initial_storage = {
+  pwrPerksTraces: Map.empty as map<address, PwrPerksGo.pwrPerksMessage>,
+  feedback: "kiss"
+};
+
+export const initial_tez = 0mutez;
+
+//functions
+
+export const _testPwrPerksGo = (
+  taddr: typed_address<parameter_of PwrPerksGo, PwrPerksGo.storage>,
+  s: address
+): unit => {
+  const contr = Test.to_contract(taddr);
+  const contrAddress = Tezos.address(contr);
+  Test.log("contract deployed with values : ");
+  Test.log(contr);
+  Test.set_source(s);
+  const status = Test.transfer_to_contract(contr, PwrPerks(), 0 as tez);
+  Test.log(status);
+  const store: PwrPerksGo.storage = Test.get_storage(taddr);
+  Test.log(store);
+  //check pwrPerks is registered
+
+  match(Map.find_opt(s, store.pwrPerksTraces)) {
+    when (Some(pwrPerksMessage)):
+      do {
+        assert_with_error(
+          pwrPerksMessage.feedback == "",
+          "feedback " + pwrPerksMessage.feedback + " is not equal to expected "
+          + "(empty)"
+        );
+        assert_with_error(
+          pwrPerksMessage.receiver == contrAddress,
+          "receiver is not equal"
+        );
+      }
+    when (None()):
+      assert_with_error(false, "don't find traces")
+  };
+};
+
+// TESTS //
+
+const testSender1pwrPerks =
+  (
+    (): unit => {
+      const orig =
+        Test.originate(contract_of(PwrPerksGo), initial_storage, initial_tez);
+      _testPwrPerksGo(orig.addr, sender1);
+    }
+  )();
