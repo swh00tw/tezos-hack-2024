@@ -11,7 +11,6 @@ export async function GET(request: Request) {
   }
 
   cookies().set("username", username);
-  console.log("set cookie", username);
 
   return Response.json({ success: true });
 }
