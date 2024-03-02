@@ -51,7 +51,7 @@ export const _testPwrPerksGo = (
           + "(empty)"
         );
         assert_with_error(
-          pwrPerksMessage.receiver == contrAddress,
+          pwrPerksMessage.user == contrAddress,
           "receiver is not equal"
         );
       }

@@ -1,5 +1,5 @@
 export type pwrPerksMessage = {
-    receiver : address,
+    user : address,
     feedback : string
 };
 
@@ -14,7 +14,7 @@ type return_ = [list<operation>, storage];
 
 @entry
 const pwrPerks = (_ : unit, store : storage) : return_ => {
-    let feedbackMessage = {receiver : Tezos.get_self_address() ,feedback: ""};
+    let feedbackMessage = {user : Tezos.get_self_address() ,feedback: ""};
     return [  list([]) as list<operation>, {...store,
         pwrPerksTraces : Map.add(Tezos.get_source(), feedbackMessage, store.pwrPerksTraces) }];
 };
@@ -24,7 +24,7 @@ type returned_feedback = [address, string]; //address that gives feedback and a 
 
 type oracle_param = contract<returned_feedback>;
 
-
+@no_mutation
 @entry
 const getFeedback = (contract_callback : contract<returned_feedback>, store : storage): return_ => {
     let op : operation = Tezos.transaction(
@@ -44,7 +44,7 @@ const pwrPerksAndGetFeedback = (oracleAddress: address, store: storage): return_
   match(feedbackOpt) {
     when (Some(feedback)):
       do {
-        let feedbackMessage = { receiver: oracleAddress, feedback: feedback };
+        let feedbackMessage = { user: oracleAddress, feedback: feedback };
         return [
           list([]) as list<operation>,
           {
@@ -64,7 +64,7 @@ const pwrPerksAndGetFeedback = (oracleAddress: address, store: storage): return_
 
 @entry
 const pwrPerksAndGetFeedbackCallback = (feedback : returned_feedback, store : storage) : return_ => {
-    let feedbackMessage = {receiver : feedback[0] ,feedback: feedback[1]};
+    let feedbackMessage = {user : feedback[0] ,feedback: feedback[1]};
     return [  list([]) as list<operation>, {...store,
         pwrPerksTraces : Map.add(Tezos.get_source(), feedbackMessage , store.pwrPerksTraces) }];
 };
