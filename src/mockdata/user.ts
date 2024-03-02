@@ -22,7 +22,7 @@ export const testUserInfo: UserInfo = {
   name: "Test User",
   email: "sh2575@cornell.edu",
   apt: "13",
-  unit: "A",
+  unit: "C",
   numResident: 2,
   aptType: "1 Bedroom 1 Bathroom",
 };
