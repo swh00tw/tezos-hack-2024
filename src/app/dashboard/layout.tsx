@@ -14,13 +14,27 @@ function NavButton(props: { route: string; children: React.ReactNode }) {
 
   return (
     <Link href={`/dashboard${route}`}>
-      <Flex
-        className={cn({
-          "text-green-10 font-medium": isActive,
-        })}
-      >
-        {children}
-      </Flex>
+      <div>
+        <Flex
+          className={cn(
+            {
+              "text-green-10 font-medium": isActive,
+            },
+            "pb-2 relative"
+          )}
+        >
+          {children}
+        </Flex>
+        <div
+          className={cn(
+            "w-full h-[2px] transition-all ease-in-out duration-200",
+            {
+              "bg-green-10": isActive,
+              "bg-transparent": !isActive,
+            }
+          )}
+        />
+      </div>
     </Link>
   );
 }
