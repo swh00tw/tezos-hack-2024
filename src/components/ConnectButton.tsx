@@ -16,15 +16,12 @@ export const ConnectButton = (props: ConnectButtonProps): JSX.Element => {
     useWallet();
   const connectWallet = async (): Promise<void> => {
     try {
-      await wallet.requestPermissions({
-        network: {
-          type: NetworkType.GHOSTNET,
-          rpcUrl: "https://ghostnet.tezos.marigold.dev",
-        },
-      });
+      await wallet.requestPermissions();
       // gets user's address
       const userAddress = await wallet.getPKH();
       const balance = await Tezos.tz.getBalance(userAddress);
+      Tezos.setProvider({ wallet });
+
       setUserBalance(balance.toNumber());
       setUserAddress(userAddress);
       // after connecting,

@@ -2,6 +2,7 @@
 
 import { getUserServerside } from "@/utils/getUserServerside";
 import { redirect } from "next/navigation";
+import CurrentBill from "./CurrentBill";
 
 export default async function Dashboard() {
   const user = await getUserServerside();
@@ -9,5 +10,9 @@ export default async function Dashboard() {
     redirect("/");
   }
 
-  return <div>{user?.username}</div>;
+  return (
+    <div>
+      <CurrentBill />
+    </div>
+  );
 }

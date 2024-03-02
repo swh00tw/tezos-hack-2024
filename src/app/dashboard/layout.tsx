@@ -45,7 +45,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Flex
         className="min-h-[70svh] justify-between"
         direction={{
-          initial: "column-reverse",
+          initial: "column",
           md: "row",
         }}
       >

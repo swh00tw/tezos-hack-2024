@@ -14,8 +14,10 @@ export function useWallet() {
   const wallet = new BeaconWallet({
     name: "Training",
     preferredNetwork: NetworkType.GHOSTNET,
+    network: {
+      type: NetworkType.GHOSTNET,
+    },
   });
-  Tezos.setWalletProvider(wallet);
 
   useEffect(() => {
     (async () => {
