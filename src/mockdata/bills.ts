@@ -1,7 +1,7 @@
 export interface UtilityRecord {
   address: string;
   date: number; // Unix timestamp
-  utility: "Electricity";
+  utility: string;
   consumption: number;
   unit: string;
 }
