@@ -47,18 +47,8 @@ const didYouKnowMessages = [
   "Solar-powered chargers for devices can reduce reliance on non-renewable energy sources.",
   "Eco-friendly roofing materials can reflect more sunlight, reducing the need for air conditioning.",
   "Energy-efficient windows can block up to 70% of solar heat gain, reducing cooling needs.",
-  "Washing clothes in cold water can save up to 90% of the energy used by washing machines."
+  "Washing clothes in cold water can save up to 90% of the energy used by washing machines.",
 ];
-
-const DidYouKnowComponent = () => {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * didYouKnowMessages.length);
-    setMessage(didYouKnowMessages[randomIndex]);
-  }, []);
-};
-
 
 function NavButton(props: { route: string; children: React.ReactNode }) {
   const pathname = usePathname();
@@ -95,12 +85,21 @@ function NavButton(props: { route: string; children: React.ReactNode }) {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   // State for the random message
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   // Effect to set a random message on mount
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * didYouKnowMessages.length);
     setMessage(didYouKnowMessages[randomIndex]);
+  }, []);
+
+  // change the message every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const randomIndex = Math.floor(Math.random() * didYouKnowMessages.length);
+      setMessage(didYouKnowMessages[randomIndex % didYouKnowMessages.length]);
+    }, 4000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -139,7 +138,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <Text className="text-[16px] text-gray-12" weight={"medium"}>
           💡 Did you know?
         </Text>
-        <Text className="text-[14px] text-gray-11">
+        <Text
+          key={message}
+          className="text-[14px] text-gray-11 transition-all ease-in-out duration-200"
+        >
           {message}
         </Text>
       </div>
