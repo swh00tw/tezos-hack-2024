@@ -1,12 +1,10 @@
-import React, { useState } from "react";
-import { extent, max, min } from "@visx/vendor/d3-array";
-import * as allCurves from "@visx/curve";
+import React from "react";
 import { Group } from "@visx/group";
-import { LinePath } from "@visx/shape";
-import { scaleTime, scaleLinear } from "@visx/scale";
+import { Bar } from "@visx/shape";
+import { AxisBottom, AxisLeft } from "@visx/axis";
+import { scaleBand, scaleLinear } from "@visx/scale";
 import { billRecords, UtilityRecord } from "@/mockdata/bills";
-
-type CurveType = keyof typeof allCurves;
+import { timeFormat } from "d3-time-format";
 
 type DateValue = { date: Date; value: number };
 
@@ -17,8 +15,7 @@ const transformData = (records: UtilityRecord[]): DateValue[] => {
   })).sort((a, b) => a.date.getTime() - b.date.getTime());
 };
 
-const series = [transformData(billRecords)];
-const allData = series.flat();
+const allData = transformData(billRecords);
 
 const getX = (d: DateValue) => d.date;
 const getY = (d: DateValue) => d.value;
@@ -26,58 +23,78 @@ const getY = (d: DateValue) => d.value;
 export default function Graph({
   width,
   height,
-  showControls = true,
 }: {
   width: number;
   height: number;
-  showControls?: boolean;
 }) {
-  const [curveType, setCurveType] = useState<CurveType>("curveMonotoneX");
-  const svgHeight = showControls ? height - 10 : height;
-
-  // Add padding to the domain
-  const minValue = min(allData, getY) as number;
-  const maxValue = max(allData, getY) as number;
-  const padding = (maxValue - minValue) * 0.05; // 5% padding
-
-  const xScale = scaleTime<number>({
-    domain: extent(allData, getX) as [Date, Date],
-    range: [0, width],
+  // Adjusted margins to allow space for axis labels
+  const margin = { top: 20, bottom: 50, left: 50, right: 20 };
+  
+  // Define scales
+  const xScale = scaleBand<Date>({
+    range: [margin.left, width - margin.right],
+    round: true,
+    domain: allData.map(getX),
+    padding: 0.4,
   });
   const yScale = scaleLinear<number>({
-    domain: [minValue - padding, maxValue + padding], // Adjust domain to add padding
-    range: [svgHeight, 0],
+    range: [height - margin.bottom, margin.top],
+    round: true,
+    domain: [0, Math.max(...allData.map(getY))],
   });
 
+  // Date formatter for the x-axis
+  const formatDate = timeFormat("%b %d, '%y");
+
   return (
-    <div className="visx-curves-demo">
-      <svg width={width} height={svgHeight}>
-        <rect width={width} height={svgHeight} fill="#efefef" rx={14} ry={14} />
-        {series.map((lineData, i) => (
-          <Group key={`line-${i}`}>
-            {lineData.map((d, j) => (
-              <circle
-                key={`point-${i}-${j}`}
-                r={2} // Smaller radius for cleaner look
-                cx={xScale(getX(d))}
-                cy={yScale(getY(d))}
-                stroke="rgba(33,33,33,0.5)"
-                fill="transparent"
-                strokeOpacity={0.8} // Slightly higher opacity for visibility
+    <div className="visx-bar-graph-demo">
+      <svg width={width} height={height}>
+        <rect width={width} height={height} fill="#efefef" />
+        <Group>
+          {allData.map((d, i) => {
+            const barWidth = xScale.bandwidth();
+            const barHeight = height - margin.bottom - (yScale(getY(d)) ?? 0);
+            const barX = xScale(getX(d));
+            const barY = height - margin.bottom - barHeight;
+            return (
+              <Bar
+                key={`bar-${i}`}
+                x={barX}
+                y={barY}
+                width={barWidth}
+                height={barHeight}
+                fill="rgba(33,33,33,0.5)"
               />
-            ))}
-            <LinePath<DateValue>
-              curve={allCurves[curveType]}
-              data={lineData}
-              x={(d) => xScale(getX(d)) ?? 0}
-              y={(d) => yScale(getY(d)) ?? 0}
-              stroke="#333"
-              strokeWidth={1.5} // Thinner line for a cleaner look
-              strokeOpacity={0.8}
-              shapeRendering="geometricPrecision"
-            />
-          </Group>
-        ))}
+            );
+          })}
+        </Group>
+        {/* Render the x-axis */}
+        <AxisBottom
+          top={height - margin.bottom}
+          scale={xScale}
+          tickFormat={formatDate}
+          stroke={"#333"}
+          tickStroke={"#333"}
+          tickLabelProps={() => ({
+            fill: '#333',
+            fontSize: 11,
+            textAnchor: 'middle',
+          })}
+        />
+        {/* Render the y-axis */}
+        <AxisLeft
+          left={margin.left}
+          scale={yScale}
+          stroke={"#333"}
+          tickStroke={"#333"}
+          tickLabelProps={() => ({
+            fill: '#333',
+            fontSize: 11,
+            textAnchor: 'end',
+            dx: '-0.25em',
+            dy: '0.25em'
+          })}
+        />
       </svg>
     </div>
   );
