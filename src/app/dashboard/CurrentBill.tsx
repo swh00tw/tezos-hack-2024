@@ -37,7 +37,7 @@ function EligibleUI() {
         <Button
           className="mt-4 w-[50%]"
           onClick={() => {
-            alert("Money sent to your wallet!");
+            alert("To be implemented");
           }}
         >
           Payout
@@ -82,7 +82,7 @@ function NotEligibleUI() {
         <Button
           className="mt-4 w-[100%]"
           onClick={() => {
-            alert("Money sent to your wallet!");
+            alert("To be implemented");
           }}
         >
           Learn more 📚
