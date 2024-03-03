@@ -3,6 +3,7 @@
 import { TriangleDownIcon, TriangleUpIcon } from "@radix-ui/react-icons";
 import { Text, Flex, Button } from "@radix-ui/themes";
 import { useAuth } from "../AuthProvider";
+import { useState, useEffect } from "react";
 
 function EligibleUI() {
   return (
@@ -92,6 +93,17 @@ function NotEligibleUI() {
 }
 
 export default function CurrentBill() {
-  const isEligible = false;
-  return isEligible ? <EligibleUI /> : <NotEligibleUI />;
+  const [isEligible, setIsEligible] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // fetch data from local storage
+    const data = localStorage.getItem("isEligible");
+    setIsEligible(data === "1");
+  }, []);
+
+  return isEligible === null ? null : isEligible ? (
+    <EligibleUI />
+  ) : (
+    <NotEligibleUI />
+  );
 }
