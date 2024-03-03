@@ -17,14 +17,14 @@ function EligibleUI() {
         </div>
         <div className="flex-col">
           <div>01/27/2024 - 02/29/2024</div>
-          <div className="font-medium">400.30 kWh</div>
+          <div className="font-medium">420.30 kWh</div>
         </div>
         <div className="mt-4 p-4 bg-green-4 rounded-4">
           <Text>Stats: </Text>
           <Flex className="items-center gap-x-1 pl-2">
             {" "}
             <TriangleDownIcon width={18} height={18} color="green" />
-            from last month 23%
+            from last month 30%
           </Flex>
         </div>
       </div>
@@ -60,14 +60,14 @@ function NotEligibleUI() {
         </div>
         <div className="flex-col">
           <div>01/27/2024 - 02/29/2024</div>
-          <div className="font-medium">50.30 kWh</div>
+          <div className="font-medium">1200.30 kWh</div>
         </div>
         <div className="mt-4 p-4 bg-red-4 rounded-4">
           <Text>Stats: </Text>
           <Flex className="items-center gap-x-1 pl-2">
             {" "}
             <TriangleUpIcon width={18} height={18} color="red" />
-            from last month 23%
+            from last month 33%
           </Flex>
         </div>
       </div>
