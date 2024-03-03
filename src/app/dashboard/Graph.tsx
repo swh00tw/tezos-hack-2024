@@ -9,10 +9,12 @@ import { timeFormat } from "d3-time-format";
 type DateValue = { date: Date; value: number };
 
 const transformData = (records: UtilityRecord[]): DateValue[] => {
-  return records.map(record => ({
-    date: new Date(record.date * 1000),
-    value: record.consumption,
-  })).sort((a, b) => a.date.getTime() - b.date.getTime());
+  return records
+    .map((record) => ({
+      date: new Date(record.date * 1000),
+      value: record.consumption,
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 };
 
 const allData = transformData(billRecords);
@@ -29,7 +31,7 @@ export default function Graph({
 }) {
   // Adjusted margins to allow space for axis labels
   const margin = { top: 20, bottom: 50, left: 50, right: 20 };
-  
+
   // Define scales
   const xScale = scaleBand<Date>({
     range: [margin.left, width - margin.right],
@@ -63,7 +65,7 @@ export default function Graph({
                 y={barY}
                 width={barWidth}
                 height={barHeight}
-                fill="rgba(33,33,33,0.5)"
+                fill="#2C9A66"
               />
             );
           })}
@@ -76,9 +78,9 @@ export default function Graph({
           stroke={"#333"}
           tickStroke={"#333"}
           tickLabelProps={() => ({
-            fill: '#333',
-            fontSize: 11,
-            textAnchor: 'middle',
+            fill: "#333",
+            fontSize: 9,
+            textAnchor: "middle",
           })}
         />
         {/* Render the y-axis */}
@@ -88,11 +90,11 @@ export default function Graph({
           stroke={"#333"}
           tickStroke={"#333"}
           tickLabelProps={() => ({
-            fill: '#333',
+            fill: "#333",
             fontSize: 11,
-            textAnchor: 'end',
-            dx: '-0.25em',
-            dy: '0.25em'
+            textAnchor: "end",
+            dx: "-0.25em",
+            dy: "0.25em",
           })}
         />
       </svg>
