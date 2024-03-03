@@ -19,7 +19,7 @@ export const testuser: UserCredentials = {
 
 export const testUserInfo: UserInfo = {
   username: "testuser",
-  name: "Test User",
+  name: "Amy da Zhao",
   email: "sh2575@cornell.edu",
   apt: "13",
   unit: "C",
