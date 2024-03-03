@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-import { extent, max } from '@visx/vendor/d3-array';
-import * as allCurves from '@visx/curve';
-import { Group } from '@visx/group';
-import { LinePath } from '@visx/shape';
-import { scaleTime, scaleLinear } from '@visx/scale';
-import { MarkerArrow, MarkerCross, MarkerX, MarkerCircle, MarkerLine } from '@visx/marker';
+import React, { useState } from "react";
+import { extent, max } from "@visx/vendor/d3-array";
+import * as allCurves from "@visx/curve";
+import { Group } from "@visx/group";
+import { LinePath } from "@visx/shape";
+import { scaleTime, scaleLinear } from "@visx/scale";
 
 type CurveType = keyof typeof allCurves;
 
 // Assuming DateValue structure for consistency
-type DateValue = { date: Date; value: number; };
+type DateValue = { date: Date; value: number };
 
 // Hardcode 40 values within the specified range
 const generateHardcodedData = (): DateValue[] => {
@@ -30,8 +29,16 @@ const allData = series.flat(); // Flatten the array for processing
 const getX = (d: DateValue) => d.date;
 const getY = (d: DateValue) => d.value;
 
-export default function Dummy({ width, height, showControls = true }) {
-  const [curveType, setCurveType] = useState<CurveType>('curveNatural');
+export default function Graph({
+  width,
+  height,
+  showControls = true,
+}: {
+  width: number;
+  height: number;
+  showControls?: boolean;
+}) {
+  const [curveType, setCurveType] = useState<CurveType>("curveNatural");
   const svgHeight = showControls ? height - 10 : height;
 
   // Scales setup
@@ -64,8 +71,8 @@ export default function Dummy({ width, height, showControls = true }) {
             <LinePath<DateValue>
               curve={allCurves[curveType]}
               data={lineData}
-              x={d => xScale(getX(d)) ?? 0}
-              y={d => yScale(getY(d)) ?? 0}
+              x={(d) => xScale(getX(d)) ?? 0}
+              y={(d) => yScale(getY(d)) ?? 0}
               stroke="#333"
               strokeWidth={2}
               strokeOpacity={0.6}

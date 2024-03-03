@@ -3,6 +3,8 @@
 import { useWallet } from "@/hooks/useWallet";
 import { billRecords, UtilityRecord } from "@/mockdata/bills";
 import { Table } from "@radix-ui/themes";
+import Graph from "../Graph";
+import { ParentSize } from "@visx/responsive";
 
 function RecordRow({ record }: { record: UtilityRecord }) {
   const dateString = new Date(record.date * 1000).toLocaleDateString();
@@ -41,6 +43,13 @@ export default function Page() {
             ))}
         </Table.Body>
       </Table.Root>
+      <div className="w-full h-[400px] p-4">
+        <ParentSize>
+          {(parent) => {
+            return <Graph width={parent.width} height={parent.height} />;
+          }}
+        </ParentSize>
+      </div>
     </div>
   );
 }
